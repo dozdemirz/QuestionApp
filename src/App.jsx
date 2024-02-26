@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import questions from "./questions";
 
+
 function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -135,7 +136,7 @@ function App() {
           <div className="img-container">
             <img
               className="question-img"
-              src={`src/assets/${questions[currentQuestionIndex].media}`}
+              src={questions[currentQuestionIndex].media}
               alt=""
             />
           </div>
