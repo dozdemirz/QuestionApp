@@ -161,13 +161,14 @@
   border: none;
   background-color: rgba(221, 85, 51, 0.685);
   color: white;
-  padding: 10px 20px;
+  padding: 20px 20px;
   text-align: center;
   text-decoration: none;
   font-size: 16px;
   cursor: pointer;
   border-radius: 12px;
-  margin-right: 10px;
+  margin-left: 200px;
+  
 }
 
 .answer-indicators {

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import questions from "./questions";
 
-
 function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -12,27 +11,31 @@ function App() {
   const [showOptions, setShowOptions] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [answerStatus, setAnswerStatus] = useState(new Array(10).fill(null));
+  const [startTest, setStartTest] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (secondsLeft > 0 && !showResults) {
-        setSecondsLeft((prevSeconds) => prevSeconds - 1);
+    let timer;
+    if (startTest) {
+      timer = setInterval(() => {
+        if (secondsLeft > 0 && !showResults) {
+          setSecondsLeft((prevSeconds) => prevSeconds - 1);
 
-        // 10 saniye sonra
-        if (secondsLeft === 20) {
-          setShowOptions(true);
-        }
-      } else {
-        if (currentQuestionIndex < questions.length - 1 && !showResults) {
-          setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+          // 10 saniye sonra
+          if (secondsLeft === 20) {
+            setShowOptions(true);
+          }
         } else {
-          setShowResults(true);
-          clearInterval(timer);
+          if (currentQuestionIndex < questions.length - 1 && !showResults) {
+            setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+          } else {
+            setShowResults(true);
+            clearInterval(timer);
+          }
+          setSecondsLeft(30);
+          setShowOptions(false);
         }
-        setSecondsLeft(30);
-        setShowOptions(false);
-      }
-    }, 1000);
+      }, 1000);
+    }
 
     return () => clearInterval(timer);
   }, [
@@ -42,7 +45,12 @@ function App() {
     emptyAnswers,
     secondsLeft,
     showResults,
+    startTest,
   ]);
+
+  const handleStartTest = () => {
+    setStartTest(true);
+  };
 
   const handleAnswer = (isCorrect) => {
     const updatedStatus = [...answerStatus];
@@ -89,6 +97,7 @@ function App() {
     setShowResults(false);
     setShowOptions(false);
     setAnswerStatus(new Array(10).fill(null));
+    setStartTest(false);
   };
 
   const timerBarWidth = (secondsLeft / 30) * 100 + "%";
@@ -98,85 +107,100 @@ function App() {
       <div className="header">
         <h1 className="title">QUESTION APP</h1>
       </div>
-      {showResults ? (
-        <div className="result-container">
-          <h2>Test Sonuçları</h2>
-          <p>Doğru Cevaplar: {correctAnswers}</p>
-          <p>Yanlış Cevaplar: {wrongAnswers}</p>
-          <p>Boş Cevaplar: {emptyAnswers}</p>
-          <button className="retry-button" onClick={handleRetry}>
-            Tekrar Dene
+      {!startTest ? (
+        <div className="entry-screen">
+          <h2>Teste Başlamak İçin Başla Butonuna Tıklayın</h2>
+          <button className="start-button" onClick={handleStartTest}>
+            Başla
           </button>
-          <div className="answer-indicators">
-            {answerStatus.map((status, index) => (
-              <div
-                key={index}
-                className="answer-indicator"
-                style={{
-                  backgroundColor:
-                    status === null
-                      ? "rgb(231, 231, 102)"
-                      : status
-                      ? "rgb(75, 177, 75)"
-                      : "rgb(182, 41, 41)",
-                }}
-              >
-                {index + 1}
-                <div className="answer-info">
-                  <p>Cevabınız: {questions[index].options[status]}</p>
-                  <p>Doğru Cevap: {questions[index].answer}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       ) : (
-        <div>
-          <div className="question-number">Soru {currentQuestionIndex + 1}</div>
-          <div className="img-container">
-            <img
-              className="question-img"
-              src={questions[currentQuestionIndex].media}
-              alt=""
-            />
-          </div>
-          <div className="text-container">
-            <div className="question-text">
-              {questions[currentQuestionIndex].question}
-            </div>
-          </div>
-          {showOptions ? (
-            <div className="options-container">
-              {questions[currentQuestionIndex].options.map((option, index) => (
-                <div
-                  key={index}
-                  className="option"
-                  onClick={() =>
-                    handleAnswer(
-                      option === questions[currentQuestionIndex].answer
-                    )
-                  }
-                >
-                  {option}
-                </div>
-              ))}
-            </div>
-          ) : null}
-          <div className="footer">
-            {!showResults && (
-              <div className="timer-bar-container">
-                <div
-                  className="timer-bar"
-                  style={{ width: timerBarWidth }}
-                ></div>
-                <div className="time-left">{secondsLeft} sn kaldı</div>
+        <>
+          {showResults ? (
+            <div className="result-container">
+              <h2>Test Sonuçları</h2>
+              <p>Doğru Cevaplar: {correctAnswers}</p>
+              <p>Yanlış Cevaplar: {wrongAnswers}</p>
+              <p>Boş Cevaplar: {emptyAnswers}</p>
+              <button className="retry-button" onClick={handleRetry}>
+                Tekrar Dene
+              </button>
+              <div className="answer-indicators">
+                {answerStatus.map((status, index) => (
+                  <div
+                    key={index}
+                    className="answer-indicator"
+                    style={{
+                      backgroundColor:
+                        status === null
+                          ? "rgb(231, 231, 102)"
+                          : status
+                          ? "rgb(75, 177, 75)"
+                          : "rgb(182, 41, 41)",
+                    }}
+                  >
+                    {index + 1}
+                    <div className="answer-info">
+                      <p>Cevabınız: {questions[index].options[status]}</p>
+                      <p>Doğru Cevap: {questions[index].answer}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
-            <button className="skip-button" onClick={handleSkip}>
-              Soruyu Atla
-            </button>
-          </div>
-        </div>
+            </div>
+          ) : (
+            <div>
+              <div className="question-number">
+                Soru {currentQuestionIndex + 1}
+              </div>
+              <div className="img-container">
+                <img
+                  className="question-img"
+                  src={questions[currentQuestionIndex].media}
+                  alt=""
+                />
+              </div>
+              <div className="text-container">
+                <div className="question-text">
+                  {questions[currentQuestionIndex].question}
+                </div>
+              </div>
+              {showOptions ? (
+                <div className="options-container">
+                  {questions[currentQuestionIndex].options.map(
+                    (option, index) => (
+                      <div
+                        key={index}
+                        className="option"
+                        onClick={() =>
+                          handleAnswer(
+                            option === questions[currentQuestionIndex].answer
+                          )
+                        }
+                      >
+                        {option}
+                      </div>
+                    )
+                  )}
+                </div>
+              ) : null}
+              <div className="footer">
+                {!showResults && (
+                  <div className="timer-bar-container">
+                    <div
+                      className="timer-bar"
+                      style={{ width: timerBarWidth }}
+                    ></div>
+                    <div className="time-left">{secondsLeft} sn kaldı</div>
+                  </div>
+                )}
+                <button className="skip-button" onClick={handleSkip}>
+                  Soruyu Atla
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
