@@ -14,3 +14,6 @@ This project is a simple question application that allows users to answer a seri
 - React: JavaScript library for building user interfaces.
 - JavaScript: Programming language used for the application logic.
 - CSS: Styling language for designing the user interface.
+
+#### Live Link
+https://main--tiny-rugelach-035f04.netlify.app/
